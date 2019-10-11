@@ -5,7 +5,7 @@
  * A dynamic, browser-based visualization library.
  *
  * @version 4.21.0-SNAPSHOT
- * @date    2019-07-02
+ * @date    2019-10-11
  *
  * @license
  * Copyright (C) 2011-2017 Almende B.V, http://almende.com
@@ -15011,8 +15011,33 @@ var Edge = function () {
             ctx.rotate(rotationPoint.angle);
           }
 
-          // draw the label
-          this.labelModule.draw(ctx, point.x, point.y, this.selected, this.hover);
+          //determine if label is off screen
+          var scale = this.body.view.scale;
+
+          var canvas_width = ctx.canvas.width;
+          var canvas_height = ctx.canvas.height;
+
+          var lSize = this.labelModule.getSize();
+
+          var draw_x = this.body.view.translation.x + lSize.left * scale;
+          var draw_y = this.body.view.translation.y + lSize.top * scale;
+
+          var left_x = draw_x;
+          var top_y = draw_y;
+          var right_x = left_x + lSize.width * scale;
+          var bottom_y = top_y + lSize.height * scale;
+
+          if (!(right_x < 0 || top_y > canvas_height || left_x > canvas_width || bottom_y < 0)) {
+
+            // draw the label
+            this.labelModule.draw(ctx, point.x, point.y, this.selected, this.hover);
+          }
+
+          /*ctx.save()
+          ctx.resetTransform()
+            ctx.strokeStyle = "#ff0000";
+          ctx.strokeRect(draw_x, draw_y, lSize.width*scale, lSize.height*scale);
+            ctx.restore();*/
 
           /*
                   // Useful debug code: draw a border around the label
